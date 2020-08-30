@@ -142,6 +142,12 @@ class AutoTinder:
             writer = csv.writer(outfile)
             writer.writerow(d)
 
+    def scrap(self):
+        count = int(input())
+        for i in range(count):
+            self.get_data()
+            self.reload()
+
 
 """if __name__ == '__main__':
     bot = AutoTinder()
