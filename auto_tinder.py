@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 from auth import password, email
 from bs4 import BeautifulSoup
+import csv
 
 
 class AutoTinder:
@@ -130,9 +131,16 @@ class AutoTinder:
             for extra in extras:
                 print(extra.text)
 
+            self.write_csv([name, age, lives_in, bio, ', '.join([tag.text for tag in tags]),
+                            ', '.join([extra.text for extra in extras])])
+
         except TimeoutException:
             print("Name, Age Loading took too much time!")
 
+    def write_csv(self, d):
+        with open('data.csv', 'a', encoding='utf-8') as outfile:
+            writer = csv.writer(outfile)
+            writer.writerow(d)
 
 
 """if __name__ == '__main__':
