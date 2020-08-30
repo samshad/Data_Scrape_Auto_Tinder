@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 from auth import password, email
+from bs4 import BeautifulSoup
 
 
 class AutoTinder:
@@ -16,8 +17,9 @@ class AutoTinder:
         webdriver_path = 'chromedriver_win32/chromedriver.exe'
         chrome_options = Options()
         #chrome_options.add_argument("-incognito")
+        chrome_options.add_argument("--disable-notifications")
         self.driver = webdriver.Chrome(webdriver_path, options=chrome_options)
-        self.driver.maximize_window()
+        #self.driver.maximize_window()
     
     def login(self):
         self.driver.get('https://tinder.com')
@@ -62,6 +64,8 @@ class AutoTinder:
             except TimeoutException:
                 print("Notification button Loading took too much time!")
 
+            print("Login done successfully!!!")
+
         except TimeoutException:
             print("Facebook login button Loading took too much time!")
 
@@ -75,35 +79,55 @@ class AutoTinder:
             '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')
         dislike_btn.click()
 
-    def get_details(self):
+    def reload(self):
+        self.driver.refresh()
+
+    def get_data(self):
         try:
-            details = WebDriverWait(self.driver, 10).until(
+            expand_btn = WebDriverWait(self.driver, 10).until(
                     EC.presence_of_element_located(
                         (By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')))
-            expand_btn = self.driver.find_element_by_xpath(
-                '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')
             expand_btn.click()
             sleep(2)
             name = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div[1]/div/h1').text
             age = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div[1]/span').text
-            tags = []
             bio = ''
             try:
-                tags = self.driver.find_elements_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div[2]/div[3]')
-                bio = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div').text
+                bio = self.driver.find_element_by_xpath(
+                    '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div').text
             except:
                 pass
-            if tags:
-                for tag in tags:
-                    print(tag)
-            print(name, age, bio)
+
+            html = BeautifulSoup(self.driver.page_source)
+            tags = html.findAll('div', {"class": 'Bdrs(100px)'})
+            extras = html.findAll('div', {"class": 'Us(t) Va(m) D(ib) My(2px) NetWidth(100%,20px) C($c-secondary)'})
+
+            lives_in = html.find('div', {"class": 'Us(t) Va(m) D(ib) My(2px) NetWidth(100%,20px) C($c-secondary) Ell'})
+            if lives_in:
+                lives_in = lives_in.text
+            else:
+                lives_in = ''
+            lives_in = ''.join([x.strip() for x in lives_in.split('Lives in')])
+
+            print('Name: ', name.strip(), '\n', 'Age: ', age.strip(), '\n', 'Bio: ', bio.strip(),
+                  '\nLives in: ', lives_in)
+
+            if len(tags) > 0:
+                print("\nTags:")
+                print(', '.join([tag.text for tag in tags]))
+
+            print("\nExtra length: ", len(extras))
+            for extra in extras:
+                print(extra.text)
+
         except TimeoutException:
             print("Name, Age Loading took too much time!")
 
 
-if __name__ == '__main__':
+
+"""if __name__ == '__main__':
     bot = AutoTinder()
     bot.login()
     sleep(3)
-    bot.get_details()
+    bot.get_details()"""
 
