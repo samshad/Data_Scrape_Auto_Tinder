@@ -3,3 +3,4 @@ chromedriver_win32/
 .idea/
 __pycache__/
 auth.py
+sample.txt
