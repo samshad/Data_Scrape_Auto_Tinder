@@ -70,14 +70,24 @@ class AutoTinder:
             print("Facebook login button Loading took too much time!")
 
     def like(self):
-        like_btn = self.driver.find_element_by_xpath(
-            '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')
-        like_btn.click()
+        try:
+            like_btn = self.driver.find_element_by_xpath(
+                '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')
+            like_btn.click()
+        except:
+            like_btn = self.driver.find_element_by_xpath(
+                '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')
+            like_btn.click()
 
     def dislike(self):
-        dislike_btn = self.driver.find_element_by_xpath(
-            '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')
-        dislike_btn.click()
+        try:
+            dislike_btn = self.driver.find_element_by_xpath(
+                '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')
+            dislike_btn.click()
+        except:
+            dislike_btn = self.driver.find_element_by_xpath(
+                '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[2]/button')
+            dislike_btn.click()
 
     def reload(self):
         self.driver.refresh()
