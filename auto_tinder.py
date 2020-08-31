@@ -35,13 +35,15 @@ class AutoTinder:
     def login(self):
         self.driver.get('https://tinder.com')
 
-        cookies_accept_btn = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[2]/div/div/div[1]/button/span')
+        cookies_accept_btn = self.driver.find_element_by_xpath(
+            '//*[@id="content"]/div/div[2]/div/div/div[1]/button/span')
         cookies_accept_btn.click()
 
         delay = 5
         try:
             fb_btn = WebDriverWait(self.driver, delay).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="modal-manager"]/div/div/div[1]/div/div[3]/span/div[2]/button')))
+                EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="modal-manager"]/div/div/div[1]/div/div[3]/span/div[2]/button')))
             fb_btn.click()
 
             sleep(3)
@@ -111,11 +113,17 @@ class AutoTinder:
         try:
             expand_btn = WebDriverWait(self.driver, 10).until(
                     EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')))
+                        (By.XPATH,
+                         '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')
+                    ))
             expand_btn.click()
             sleep(2)
-            name = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div[1]/div/h1').text
-            age = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div[1]/span').text
+
+            # get html of the page for parsing data
+            html = BeautifulSoup(self.driver.page_source)
+
+            name = html.find('h1', {"class": 'Fz($xl) Fw($bold) Fxs(1) Flw(w) Pend(8px) M(0) D(i)'}).text
+            age = html.find('span', {"class": 'Whs(nw) Fz($l)'}).text
             bio = ''
             try:
                 bio = self.driver.find_element_by_xpath(
@@ -123,7 +131,6 @@ class AutoTinder:
             except:
                 pass
 
-            html = BeautifulSoup(self.driver.page_source)
             tags = html.findAll('div', {"class": 'Bdrs(100px)'})
             extras = html.findAll('div', {"class": 'Us(t) Va(m) D(ib) My(2px) NetWidth(100%,20px) C($c-secondary)'})
 
