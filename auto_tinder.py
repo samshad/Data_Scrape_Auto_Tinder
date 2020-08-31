@@ -12,16 +12,26 @@ import csv
 
 
 class AutoTinder:
+    """Initializing Class"""
     def __init__(self):
         self.email = email
         self.password = password
+
+        # Configuring the browser
         webdriver_path = 'chromedriver_win32/chromedriver.exe'
         chrome_options = Options()
-        #chrome_options.add_argument("-incognito")
+        chrome_options.add_argument("--disable-infobars")
+        # chrome_options.add_argument("start-maximized")  # For full screen browser window
+        chrome_options.add_argument("--disable-extensions")
         chrome_options.add_argument("--disable-notifications")
+
+        # Pass the argument 1 to allow and 2 to block
+        chrome_options.add_experimental_option("prefs", {
+            "profile.default_content_setting_values.notifications": 1
+        })
         self.driver = webdriver.Chrome(webdriver_path, options=chrome_options)
-        #self.driver.maximize_window()
-    
+
+    """Log in to Tinder with facebook account"""
     def login(self):
         self.driver.get('https://tinder.com')
 
@@ -38,11 +48,11 @@ class AutoTinder:
             base_window = self.driver.window_handles[0]
             self.driver.switch_to.window(self.driver.window_handles[1])
 
-            email_in = self.driver.find_element_by_xpath('//*[@id="email"]')
-            email_in.send_keys(self.email)
+            email_input = self.driver.find_element_by_xpath('//*[@id="email"]')
+            email_input.send_keys(self.email)
 
-            pw_in = self.driver.find_element_by_xpath('//*[@id="pass"]')
-            pw_in.send_keys(self.password)
+            password_input = self.driver.find_element_by_xpath('//*[@id="pass"]')
+            password_input.send_keys(self.password)
 
             login_btn = self.driver.find_element_by_xpath('//*[@id="u_0_0"]')
             login_btn.click()
@@ -70,6 +80,7 @@ class AutoTinder:
         except TimeoutException:
             print("Facebook login button Loading took too much time!")
 
+    """Like someone's profile"""
     def like(self):
         try:
             like_btn = self.driver.find_element_by_xpath(
@@ -80,6 +91,7 @@ class AutoTinder:
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')
             like_btn.click()
 
+    """Dislike someone's profile"""
     def dislike(self):
         try:
             dislike_btn = self.driver.find_element_by_xpath(
@@ -90,9 +102,11 @@ class AutoTinder:
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[2]/button')
             dislike_btn.click()
 
+    """Refresh the current web page"""
     def reload(self):
         self.driver.refresh()
 
+    """Collect data from the profile"""
     def get_data(self):
         try:
             expand_btn = WebDriverWait(self.driver, 10).until(
@@ -137,21 +151,22 @@ class AutoTinder:
         except TimeoutException:
             print("Name, Age Loading took too much time!")
 
+    """Append collected data to csv file"""
     def write_csv(self, d):
         with open('data.csv', 'a', encoding='utf-8') as outfile:
             writer = csv.writer(outfile)
             writer.writerow(d)
 
+    """Automate the scraping for specific iteration"""
     def scrap(self):
         count = int(input())
         for i in range(count):
             self.get_data()
+            # self.dislike()  # Use dislike for avoiding repetition of profiles
             self.reload()
 
 
 """if __name__ == '__main__':
     bot = AutoTinder()
-    bot.login()
-    sleep(3)
-    bot.get_details()"""
+    bot.login()"""
 
