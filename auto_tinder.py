@@ -88,10 +88,16 @@ class AutoTinder:
             like_btn = self.driver.find_element_by_xpath(
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')
             like_btn.click()
+            return
         except:
+            pass
+
+        try:
             like_btn = self.driver.find_element_by_xpath(
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')
             like_btn.click()
+        except:
+            pass
 
     """Dislike someone's profile"""
     def dislike(self):
@@ -99,10 +105,16 @@ class AutoTinder:
             dislike_btn = self.driver.find_element_by_xpath(
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')
             dislike_btn.click()
+            return
         except:
+            pass
+
+        try:
             dislike_btn = self.driver.find_element_by_xpath(
                 '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[2]/button')
             dislike_btn.click()
+        except:
+            pass
 
     """Refresh the current web page"""
     def reload(self):
@@ -125,6 +137,7 @@ class AutoTinder:
             name = html.find('h1', {"class": 'Fz($xl) Fw($bold) Fxs(1) Flw(w) Pend(8px) M(0) D(i)'}).text
             age = html.find('span', {"class": 'Whs(nw) Fz($l)'}).text
             bio = ''
+
             try:
                 bio = self.driver.find_element_by_xpath(
                     '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div').text
