@@ -155,14 +155,6 @@ class AutoTinder:
                 lives_in = ''
             lives_in = ''.join([x.strip() for x in lives_in.split('Lives in')])
 
-            if len(tags) > 0:
-                print("\nTags:")
-                print(', '.join([tag.text for tag in tags]))
-
-            print("\nExtra length: ", len(extras))
-            for extra in extras:
-                print(extra.text)
-
             self.cur_data['name'] = name
             self.cur_data['age'] = age
             self.cur_data['lives_in'] = lives_in
@@ -188,6 +180,14 @@ class AutoTinder:
             print('Name: ', name.strip(), '\n', 'Age: ', age.strip(), '\n', 'Bio: ', bio.strip(),
                   '\nLives in: ', lives_in, '\nDistance: ', distance, '\nGender: ', gender)
 
+            if len(tags) > 0:
+                print("Tags:")
+                print(', '.join([tag.text for tag in tags]))
+
+            print("Extra length: ", len(extras))
+            for extra in extras:
+                print(extra.text)
+
         except TimeoutException:
             print("Name, Age Loading took too much time!")
 
@@ -210,31 +210,51 @@ class AutoTinder:
     """Run Tinder Auto bot for specified iterations"""
     def auto_tinder(self, count):
         for _ in range(count):
-            sleep(3)
+            sleep(2)
             try:
                 self.get_data()
                 self.write_csv()
                 self.get_auto_decision()
             except:
-                self.reload()
+                try:
+                    not_interested_btn = self.driver.find_element_by_xpath(
+                        '//*[@id="modal-manager"]/div/div/div[2]/button[2]')
+                    not_interested_btn.click()
+                    self.get_data()
+                    self.write_csv()
+                    self.get_auto_decision()
+                except:
+                    self.reload()
+                    self.get_data()
+                    self.write_csv()
+                    self.get_auto_decision()
 
     """Take personal decision whether like or dislike"""
     def get_auto_decision(self):
         if self.cur_data['distance'] < 500:
             if self.cur_data['gender'] == 'man':
                 self.dislike()
+                print(f"{self.cur_data['name']} got dislike because of his gender!!!")
             else:
                 if len(self.cur_data['bio']) < 1 and len(self.cur_data['tags']) < 1 and len(
                         self.cur_data['extras']) < 20:
                     luck = int(random.random() * 100)
                     if luck <= 25:
                         self.dislike()
+                        print(f"{self.cur_data['name']} got dislike because of luck (x <= 25%)!!!")
+                        print("============================================\n")
                     else:
                         self.like()
+                        print(f"{self.cur_data['name']} got like!!!")
+                        print("============================================\n")
                 else:
                     self.like()
+                    print(f"{self.cur_data['name']} got like!!!")
+                    print("============================================\n")
         else:
             self.dislike()
+            print(f"{self.cur_data['name']} got dislike because of distance!!!")
+            print("============================================\n")
 
 
 """if __name__ == '__main__':
