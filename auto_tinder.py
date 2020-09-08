@@ -199,7 +199,7 @@ class AutoTinder:
             writer = csv.writer(outfile)
             writer.writerow(d)
 
-    """Automate the scraping for specific iteration"""
+    """Automate the scraping for specific iterations"""
     def scrap(self, count):
         for i in range(count):
             self.get_data()
@@ -207,7 +207,7 @@ class AutoTinder:
             # self.dislike()  # Use dislike for avoiding repetition of profiles
             self.reload()
 
-    """Run Tinder Auto bot for specified intervals"""
+    """Run Tinder Auto bot for specified iterations"""
     def auto_tinder(self, count):
         for _ in range(count):
             sleep(3)
