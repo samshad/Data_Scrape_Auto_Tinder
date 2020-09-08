@@ -16,6 +16,7 @@ class AutoTinder:
     def __init__(self):
         self.email = email
         self.password = password
+        self.cur_data = dict()
 
         # Configuring the browser
         webdriver_path = 'chromedriver_win32/chromedriver.exe'
@@ -165,8 +166,15 @@ class AutoTinder:
             for extra in extras:
                 print(extra.text)
 
-            self.write_csv([name, age, lives_in, bio, ', '.join([tag.text for tag in tags]),
-                            ', '.join([extra.text for extra in extras])])
+            self.cur_data['name'] = name
+            self.cur_data['age'] = age
+            self.cur_data['lives_in'] = lives_in
+            self.cur_data['bio'] = bio
+            self.cur_data['tags'] = ', '.join([tag.text for tag in tags])
+            self.cur_data['extras'] = ', '.join([tag.text for tag in tags])
+
+            self.write_csv([self.cur_data['name'], self.cur_data['age'], self.cur_data['lives_in'], self.cur_data['bio']
+                            , self.cur_data['tags'], self.cur_data['extras']])
 
         except TimeoutException:
             print("Name, Age Loading took too much time!")
