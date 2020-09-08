@@ -4,11 +4,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
 from time import sleep
-from auth import password, email
+from Auth.auth import password, email
 from bs4 import BeautifulSoup
 import csv
+import random
 
 
 class AutoTinder:
@@ -155,9 +155,6 @@ class AutoTinder:
                 lives_in = ''
             lives_in = ''.join([x.strip() for x in lives_in.split('Lives in')])
 
-            print('Name: ', name.strip(), '\n', 'Age: ', age.strip(), '\n', 'Bio: ', bio.strip(),
-                  '\nLives in: ', lives_in)
-
             if len(tags) > 0:
                 print("\nTags:")
                 print(', '.join([tag.text for tag in tags]))
@@ -171,27 +168,73 @@ class AutoTinder:
             self.cur_data['lives_in'] = lives_in
             self.cur_data['bio'] = bio
             self.cur_data['tags'] = ', '.join([tag.text for tag in tags])
-            self.cur_data['extras'] = ', '.join([tag.text for tag in tags])
+            self.cur_data['extras'] = ', '.join([extra.text for extra in extras])
 
-            self.write_csv([self.cur_data['name'], self.cur_data['age'], self.cur_data['lives_in'], self.cur_data['bio']
-                            , self.cur_data['tags'], self.cur_data['extras']])
+            self.write_csv()
+
+            distance = ''
+            gender = ''
+            for extra in extras:
+                tmp = extra.text.split(' ')
+                if len(tmp) > 1 and tmp[1] == 'kilometers':
+                    distance = tmp[0]
+                for t in tmp:
+                    if t.lower() == 'man' or t.lower() == 'woman':
+                        gender = t.lower()
+
+            self.cur_data['distance'] = int(distance)
+            self.cur_data['gender'] = gender
+
+            print('Name: ', name.strip(), '\n', 'Age: ', age.strip(), '\n', 'Bio: ', bio.strip(),
+                  '\nLives in: ', lives_in, '\nDistance: ', distance, '\nGender: ', gender)
 
         except TimeoutException:
             print("Name, Age Loading took too much time!")
 
     """Append collected data to csv file"""
-    def write_csv(self, d):
+    def write_csv(self):
+        d = [self.cur_data['name'], self.cur_data['age'], self.cur_data['lives_in'], self.cur_data['bio']
+             , self.cur_data['tags'], self.cur_data['extras']]
         with open('data.csv', 'a', encoding='utf-8') as outfile:
             writer = csv.writer(outfile)
             writer.writerow(d)
 
     """Automate the scraping for specific iteration"""
-    def scrap(self):
-        count = int(input())
+    def scrap(self, count):
         for i in range(count):
             self.get_data()
+            self.write_csv()
             # self.dislike()  # Use dislike for avoiding repetition of profiles
             self.reload()
+
+    """Run Tinder Auto bot for specified intervals"""
+    def auto_tinder(self, count):
+        for _ in range(count):
+            sleep(3)
+            try:
+                self.get_data()
+                self.write_csv()
+                self.get_auto_decision()
+            except:
+                self.reload()
+
+    """Take personal decision whether like or dislike"""
+    def get_auto_decision(self):
+        if self.cur_data['distance'] < 500:
+            if self.cur_data['gender'] == 'man':
+                self.dislike()
+            else:
+                if len(self.cur_data['bio']) < 1 and len(self.cur_data['tags']) < 1 and len(
+                        self.cur_data['extras']) < 20:
+                    luck = int(random.random() * 100)
+                    if luck <= 25:
+                        self.dislike()
+                    else:
+                        self.like()
+                else:
+                    self.like()
+        else:
+            self.dislike()
 
 
 """if __name__ == '__main__':

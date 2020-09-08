@@ -2,7 +2,8 @@ venv/
 chromedriver_win32/
 .idea/
 __pycache__/
-auth.py
+Auth/
+Auth/auth.py
 sample.txt
 00.py
 data.csv
