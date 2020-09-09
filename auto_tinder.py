@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
-from Auth.auth import password, email
+from Auth.auth import fpassword, femail, gpassword, gemail
 from bs4 import BeautifulSoup
 import csv
 import random
@@ -14,8 +14,10 @@ import random
 class AutoTinder:
     """Initializing Class"""
     def __init__(self):
-        self.email = email
-        self.password = password
+        self.femail = femail
+        self.fpassword = fpassword
+        self.gemail = gemail
+        self.gpassword = gpassword
         self.cur_data = dict()
 
         # Configuring the browser
@@ -33,7 +35,7 @@ class AutoTinder:
         self.driver = webdriver.Chrome(webdriver_path, options=chrome_options)
 
     """Log in to Tinder with facebook account"""
-    def login(self):
+    def login_fb(self):
         self.driver.get('https://tinder.com')
 
         cookies_accept_btn = self.driver.find_element_by_xpath(
@@ -52,10 +54,10 @@ class AutoTinder:
             self.driver.switch_to.window(self.driver.window_handles[1])
 
             email_input = self.driver.find_element_by_xpath('//*[@id="email"]')
-            email_input.send_keys(self.email)
+            email_input.send_keys(self.femail)
 
             password_input = self.driver.find_element_by_xpath('//*[@id="pass"]')
-            password_input.send_keys(self.password)
+            password_input.send_keys(self.fpassword)
 
             login_btn = self.driver.find_element_by_xpath('//*[@id="u_0_0"]')
             login_btn.click()
@@ -82,6 +84,63 @@ class AutoTinder:
 
         except TimeoutException:
             print("Facebook login button Loading took too much time!")
+
+    """Log in to Tinder with gmail account"""
+    def login_gmail(self):
+        self.driver.get('https://tinder.com')
+
+        cookies_accept_btn = self.driver.find_element_by_xpath(
+            '//*[@id="content"]/div/div[2]/div/div/div[1]/button/span')
+        cookies_accept_btn.click()
+
+        delay = 10
+        try:
+            sleep(2)
+            gmail_btn = WebDriverWait(self.driver, delay).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="modal-manager"]/div/div/div[1]/div/div[3]/span/div[1]/div/button')))
+            gmail_btn.click()
+
+            sleep(2)
+            base_window = self.driver.window_handles[0]
+            self.driver.switch_to.window(self.driver.window_handles[1])
+
+            # Entering Email
+            email_input = self.driver.find_element_by_xpath('//*[@id="identifierId"]')
+            email_input.send_keys(self.gemail)
+            # Clicking Next button
+            self.driver.find_element_by_xpath('//*[@id="identifierNext"]/div/button').click()
+
+            # Entering Password
+            sleep(2)
+            password_input = self.driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
+            password_input.send_keys(self.gpassword)
+
+            login_btn = self.driver.find_element_by_xpath('//*[@id="passwordNext"]/div/button')
+            login_btn.click()
+
+            self.driver.switch_to.window(base_window)
+
+            try:
+                location_allow = WebDriverWait(self.driver, delay).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]')))
+                location_allow.click()
+            except TimeoutException:
+                print("Location allow button Loading took too much time!")
+
+            try:
+                notification_allow = WebDriverWait(self.driver, delay).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]')))
+                notification_allow.click()
+            except TimeoutException:
+                print("Notification button Loading took too much time!")
+
+            print("Login done successfully!!!")
+
+        except TimeoutException:
+            print("Gmail login button Loading took too much time!")
 
     """Like someone's profile"""
     def like(self):
@@ -217,8 +276,11 @@ class AutoTinder:
                 self.get_auto_decision()
             except:
                 try:
-                    not_interested_btn = self.driver.find_element_by_xpath(
-                        '//*[@id="modal-manager"]/div/div/div[2]/button[2]')
+                    not_interested_btn = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH,
+                             '//*[@id="modal-manager"]/div/div/div[2]/button[2]')
+                        ))
                     not_interested_btn.click()
                     self.get_data()
                     self.write_csv()
@@ -234,30 +296,31 @@ class AutoTinder:
         if self.cur_data['distance'] < 500:
             if self.cur_data['gender'] == 'man':
                 self.dislike()
-                print(f"{self.cur_data['name']} got dislike because of his gender!!!")
+                print(f"***{self.cur_data['name']} got dislike because of his gender!!!***")
             else:
                 if len(self.cur_data['bio']) < 1 and len(self.cur_data['tags']) < 1 and len(
                         self.cur_data['extras']) < 20:
                     luck = int(random.random() * 100)
                     if luck <= 25:
                         self.dislike()
-                        print(f"{self.cur_data['name']} got dislike because of luck (x <= 25%)!!!")
+                        print(f"***{self.cur_data['name']} got dislike because of luck (x <= 25%)!!!***")
                         print("============================================\n")
                     else:
                         self.like()
-                        print(f"{self.cur_data['name']} got like!!!")
+                        print(f"***{self.cur_data['name']} got like!!!***")
                         print("============================================\n")
                 else:
                     self.like()
-                    print(f"{self.cur_data['name']} got like!!!")
+                    print(f"***{self.cur_data['name']} got like!!!***")
                     print("============================================\n")
         else:
             self.dislike()
-            print(f"{self.cur_data['name']} got dislike because of distance!!!")
+            print(f"***{self.cur_data['name']} got dislike because of distance!!!***")
             print("============================================\n")
 
 
-"""if __name__ == '__main__':
+"""
+if __name__ == '__main__':
     bot = AutoTinder()
-    bot.login()"""
-
+    bot.login_gmail()
+"""
