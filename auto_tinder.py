@@ -194,13 +194,13 @@ class AutoTinder:
             # get html of the page for parsing data
             html = BeautifulSoup(self.driver.page_source)
 
-            name = html.find('h1', {"class": 'Fz($xl) Fw($bold) Fxs(1) Flw(w) Pend(8px) M(0) D(i)'}).text
-            age = html.find('span', {"class": 'Whs(nw) Fz($l)'}).text
+            name = str(html.find('h1', {"class": 'Fz($xl) Fw($bold) Fxs(1) Flw(w) Pend(8px) M(0) D(i)'}).text)
+            age = str(html.find('span', {"class": 'Whs(nw) Fz($l)'}).text)
             bio = ''
 
             try:
-                bio = self.driver.find_element_by_xpath(
-                    '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div').text
+                bio = str(self.driver.find_element_by_xpath(
+                    '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div').text)
             except:
                 pass
 
@@ -209,7 +209,7 @@ class AutoTinder:
 
             lives_in = html.find('div', {"class": 'Us(t) Va(m) D(ib) My(2px) NetWidth(100%,20px) C($c-secondary) Ell'})
             if lives_in:
-                lives_in = lives_in.text
+                lives_in = str(lives_in.text)
             else:
                 lives_in = ''
             lives_in = ''.join([x.strip() for x in lives_in.split('Lives in')])
@@ -219,7 +219,7 @@ class AutoTinder:
             self.cur_data['lives_in'] = lives_in
             self.cur_data['bio'] = bio
             self.cur_data['tags'] = ', '.join([tag.text for tag in tags])
-            self.cur_data['extras'] = ', '.join([extra.text for extra in extras])
+            self.cur_data['extras'] = ', '.join([str(extra.text) for extra in extras])
 
             self.write_csv()
 
@@ -241,11 +241,11 @@ class AutoTinder:
 
             if len(tags) > 0:
                 print("Tags:")
-                print(', '.join([tag.text for tag in tags]))
+                print(', '.join([str(tag.text) for tag in tags]))
 
             print("Extra length: ", len(extras))
             for extra in extras:
-                print(extra.text)
+                print(str(extra.text))
 
         except TimeoutException:
             print("Name, Age Loading took too much time!")
@@ -296,26 +296,26 @@ class AutoTinder:
         if self.cur_data['distance'] < 500:
             if self.cur_data['gender'] == 'man':
                 self.dislike()
-                print(f"***{self.cur_data['name']} got dislike because of his gender!!!***")
+                print(f"***{self.cur_data['name']} got disliked because of his gender!!!***")
             else:
                 if len(self.cur_data['bio']) < 1 and len(self.cur_data['tags']) < 1 and len(
                         self.cur_data['extras']) < 20:
                     luck = int(random.random() * 100)
                     if luck <= 25:
                         self.dislike()
-                        print(f"***{self.cur_data['name']} got dislike because of luck (x <= 25%)!!!***")
+                        print(f"***{self.cur_data['name']} got disliked because of luck (x <= 25%)!!!***")
                         print("============================================\n")
                     else:
                         self.like()
-                        print(f"***{self.cur_data['name']} got like!!!***")
+                        print(f"***{self.cur_data['name']} got liked!!!***")
                         print("============================================\n")
                 else:
                     self.like()
-                    print(f"***{self.cur_data['name']} got like!!!***")
+                    print(f"***{self.cur_data['name']} got liked!!!***")
                     print("============================================\n")
         else:
             self.dislike()
-            print(f"***{self.cur_data['name']} got dislike because of distance!!!***")
+            print(f"***{self.cur_data['name']} got disliked because of distance!!!***")
             print("============================================\n")
 
 
