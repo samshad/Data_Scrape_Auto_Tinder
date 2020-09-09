@@ -223,8 +223,6 @@ class AutoTinder:
             self.cur_data['tags'] = ', '.join([tag.text for tag in tags])
             self.cur_data['extras'] = ', '.join([str(extra.text) for extra in extras])
 
-            self.write_csv()
-
             distance = ''
             gender = ''
             for extra in extras:
