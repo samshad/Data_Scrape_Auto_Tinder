@@ -233,7 +233,11 @@ class AutoTinder:
                     if t.lower() == 'man' or t.lower() == 'woman':
                         gender = t.lower()
 
-            self.cur_data['distance'] = int(distance)
+            try:
+                self.cur_data['distance'] = int(distance)
+            except:
+                self.cur_data['distance'] = int(0)
+
             self.cur_data['gender'] = gender
 
             print('Name: ', name.strip(), '\n', 'Age: ', age.strip(), '\n', 'Bio: ', bio.strip(),
