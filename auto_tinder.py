@@ -223,12 +223,12 @@ class AutoTinder:
             self.cur_data['tags'] = ', '.join([tag.text for tag in tags])
             self.cur_data['extras'] = ', '.join([str(extra.text) for extra in extras])
 
-            distance = ''
+            distance = 0
             gender = ''
             for extra in extras:
                 tmp = extra.text.split(' ')
                 if len(tmp) > 1 and tmp[1] == 'kilometers':
-                    distance = tmp[0]
+                    distance = int(tmp[0])
                 for t in tmp:
                     if t.lower() == 'man' or t.lower() == 'woman':
                         gender = t.lower()
@@ -252,15 +252,22 @@ class AutoTinder:
                 print(str(extra.text))
 
         except TimeoutException:
+            not_now_btn = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH,
+                     '//*[@id="modal-manager"]/div/div/button[2]')
+                ))
+            not_now_btn.click()
             print("Name, Age Loading took too much time!")
 
     """Append collected data to csv file"""
     def write_csv(self):
-        d = [self.cur_data['name'], self.cur_data['age'], self.cur_data['lives_in'], self.cur_data['bio']
-             , self.cur_data['tags'], self.cur_data['extras']]
-        with open('data.csv', 'a', encoding='utf-8') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerow(d)
+        if self.cur_data['distance'] <= 500:
+            d = [self.cur_data['name'], self.cur_data['age'], self.cur_data['lives_in'], self.cur_data['bio']
+                 , self.cur_data['tags'], self.cur_data['extras']]
+            with open('Data/data.csv', 'a', encoding='utf-8') as outfile:
+                writer = csv.writer(outfile)
+                writer.writerow(d)
 
     """Automate the scraping for specific iterations"""
     def scrap(self, count):
@@ -286,6 +293,12 @@ class AutoTinder:
                              '//*[@id="modal-manager"]/div/div/div[2]/button[2]')
                         ))
                     not_interested_btn.click()
+                    not_now_btn = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH,
+                             '//*[@id="modal-manager"]/div/div/button[2]')
+                        ))
+                    not_now_btn.click()
                     self.get_data()
                     self.write_csv()
                     self.get_auto_decision()
@@ -304,15 +317,15 @@ class AutoTinder:
             else:
                 if len(self.cur_data['bio']) < 1 and len(self.cur_data['tags']) < 1 and len(
                         self.cur_data['extras']) < 20:
-                    luck = int(random.random() * 100)
-                    if luck <= 25:
+                    """luck = int(random.random() * 100)
+                    if luck <= 1:
                         self.dislike()
                         print(f"***{self.cur_data['name']} got disliked because of luck (x <= 25%)!!!***")
                         print("============================================\n")
-                    else:
-                        self.like()
-                        print(f"***{self.cur_data['name']} got liked!!!***")
-                        print("============================================\n")
+                    else:"""
+                    self.like()
+                    print(f"***{self.cur_data['name']} got liked!!!***")
+                    print("============================================\n")
                 else:
                     self.like()
                     print(f"***{self.cur_data['name']} got liked!!!***")
